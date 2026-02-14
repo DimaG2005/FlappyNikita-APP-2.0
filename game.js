@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 // --- ФОН ---
 const bgImage = new Image();
-bgImage.src = "motyzka1.jpg"; // убедись, что файл в той же папке
+bgImage.src = "sply.jpg";
 
 // --- МУЗЫКА ---
 const music = new Audio("music2.mp3");
@@ -28,33 +28,42 @@ let bird = {
     velocity: 0
 };
 
-let gravity = 0.35;      // скорость падения
-let jumpPower = -8.5;    // сила прыжка
+let gravity = 0.35;
+let jumpPower = -9;
 let pipes = [];
 let score = 0;
 let gameActive = true;
 
-// --- СПАВН ТРУБ ---
-function spawnPipe() {
-    const gap = 220; // расстояние между трубами
-    const topHeight = Math.random() * (canvas.height - gap - 100) + 50;
+// --- АДАПТИВНЫЕ ПАРАМЕТРЫ ---
+function updateGameParameters() {
+    const scale = canvas.height / 800; // базовая высота = 800px
+    gravity = 0.35 * scale;
+    jumpPower = -9 * scale;
+    pipeGap = 220 * scale;      // расстояние между трубами
+    pipeSpacing = 1500 * scale; // интервал появления труб в мс
+}
 
+// --- СПАВН ТРУБ ---
+let pipeGap = 220;
+let pipeSpacing = 1500;
+function spawnPipe() {
+    const topHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
     pipes.push({
         x: canvas.width,
         top: topHeight,
-        bottom: topHeight + gap,
+        bottom: topHeight + pipeGap,
         passed: false
     });
 }
 
-// Трубы появляются каждые 1.5 сек
-setInterval(spawnPipe, 1500);
+// интервал появления труб адаптивный
+let pipeInterval = setInterval(spawnPipe, pipeSpacing);
 
 // --- КЕРУВАННЯ ---
 function jump() {
     if (!gameActive) {
         restart();
-        return; // сразу прыгаем после рестарта
+        return;
     }
     bird.velocity = jumpPower;
     startMusic();
@@ -73,15 +82,13 @@ function update() {
     bird.velocity += gravity;
     bird.y += bird.velocity;
 
-    // проверка выхода за экран
     if (bird.y < 0 || bird.y + bird.size > canvas.height) {
         gameActive = false;
     }
 
     pipes.forEach(pipe => {
-        pipe.x -= 4; // скорость движения труб
+        pipe.x -= 4;
 
-        // коллизия
         if (
             bird.x < pipe.x + 70 &&
             bird.x + bird.size > pipe.x &&
@@ -90,21 +97,19 @@ function update() {
             gameActive = false;
         }
 
-        // подсчёт очков
         if (!pipe.passed && bird.x > pipe.x + 70) {
             pipe.passed = true;
             score++;
         }
     });
 
-    // удаляем трубы, которые вышли за экран
     pipes = pipes.filter(p => p.x > -80);
 }
 
 // --- ФОН С COVER ---
 function drawBackgroundCover() {
     if (!bgImage.complete || bgImage.naturalWidth === 0) {
-        ctx.fillStyle = "#87CEEB"; // временный фон
+        ctx.fillStyle = "#87CEEB";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         return;
     }
@@ -169,14 +174,19 @@ function gameLoop() {
 }
 
 // --- RESIZE ---
-window.addEventListener("resize", () => {
+function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-});
+    updateGameParameters();
+
+    clearInterval(pipeInterval); // пересоздаем интервал для труб с новым масштабом
+    pipeInterval = setInterval(spawnPipe, pipeSpacing);
+}
+window.addEventListener("resize", resizeCanvas);
 
 // --- ЗАПУСК ---
 bgImage.onload = () => {
-    console.log("Background loaded!");
+    updateGameParameters();
     gameLoop();
 };
 
