@@ -29,7 +29,7 @@ let bird = {
 };
 
 let gravity = 0.2;
-let jumpPower = -9;
+let jumpPower = -6;
 let pipes = [];
 let score = 0;
 let gameActive = true;
@@ -193,6 +193,7 @@ bgImage.onload = () => {
 bgImage.onerror = () => {
     console.error("Failed to load background image.");
 };
+
 
 
 
