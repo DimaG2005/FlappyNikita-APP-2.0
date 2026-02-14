@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 // --- ФОН ---
 const bgImage = new Image();
-bgImage.src = "sply.jpg";
+bgImage.src = "motyzka1.jpg";
 
 // --- МУЗЫКА ---
 const music = new Audio("music2.mp3");
@@ -193,4 +193,5 @@ bgImage.onload = () => {
 bgImage.onerror = () => {
     console.error("Failed to load background image.");
 };
+
 
