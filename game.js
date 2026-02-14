@@ -28,7 +28,7 @@ let bird = {
     velocity: 0
 };
 
-let gravity = 0.35;
+let gravity = 0.2;
 let jumpPower = -9;
 let pipes = [];
 let score = 0;
@@ -193,5 +193,6 @@ bgImage.onload = () => {
 bgImage.onerror = () => {
     console.error("Failed to load background image.");
 };
+
 
 
